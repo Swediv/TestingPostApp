@@ -35,6 +35,7 @@ class MainPostsInteractor: MainPostsInteractorProtocol {
                 switch jsonData {
                 case let .success(post):
                     self?.presenter?.interactorDidFetchedPosts(with: .success(post.data.items), isNeedToClear: isNeedToClear)
+                    self?.cursor = post.data.cursor
                     
                 case .failure(.decodeError):
                     self?.presenter.interactorDidFetchedPosts(with: .failure(.noPosts), isNeedToClear: isNeedToClear)
