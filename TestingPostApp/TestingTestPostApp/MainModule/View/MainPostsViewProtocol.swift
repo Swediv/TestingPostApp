@@ -8,7 +8,6 @@
 import Foundation
 
 protocol MainPostsViewProtocol: AnyObject {
-    var isLoading: Bool { get set }
     func reloadData()
     func startAnimating()
     func stopAnimating()

@@ -9,12 +9,12 @@ import Foundation
 
 class DetailsConfigurator: DetailsConfiguratorProtocol {
     
-    func configure(with viewController: DetailsViewController, post: Item) {
-        let presenter = DetailsPresenter(view: viewController)
+    func configure(with ViewController: DetailsViewController, post: Item) {
+        let presenter = DetailsPresenter(view: ViewController)
         let interactor = DetailsInteractor(presenter: presenter)
-        let router = DetailsRouter(view: viewController)
+        let router = DetailsRouter(view: ViewController)
         
-        viewController.presenter = presenter
+        ViewController.presenter = presenter
         presenter.interactor = interactor
         presenter.router = router
         

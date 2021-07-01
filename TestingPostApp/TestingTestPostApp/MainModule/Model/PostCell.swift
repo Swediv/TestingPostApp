@@ -9,13 +9,14 @@ import Foundation
 import UIKit
 
 class PostCell: UITableViewCell {
+    private var task: URLSessionTask?
     
     var imageURL: URL? {
         didSet {
-            contentImageView.image = nil
             setImage()
         }
     }
+    
     lazy var activityIndicator: UIActivityIndicatorView = {
         let refreshControl = UIActivityIndicatorView()
         refreshControl.color = .white
@@ -24,6 +25,7 @@ class PostCell: UITableViewCell {
         
         return refreshControl
     }()
+    
     lazy var commentsCountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -31,6 +33,7 @@ class PostCell: UITableViewCell {
         
         return label
     }()
+    
     lazy var commentsImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -42,6 +45,7 @@ class PostCell: UITableViewCell {
         
         return imageView
     }()
+    
     lazy var shareCountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -49,6 +53,7 @@ class PostCell: UITableViewCell {
         
         return label
     }()
+    
     lazy var shareImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -60,6 +65,7 @@ class PostCell: UITableViewCell {
         
         return imageView
     }()
+    
     lazy var likeCountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -67,6 +73,7 @@ class PostCell: UITableViewCell {
         
         return label
     }()
+    
     lazy var likeImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -75,7 +82,6 @@ class PostCell: UITableViewCell {
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 13
         imageView.backgroundColor = #colorLiteral(red: 0.5837096572, green: 0.2491314113, blue: 1, alpha: 1)
-        
         return imageView
     }()
     
@@ -86,6 +92,7 @@ class PostCell: UITableViewCell {
         view.alpha = 0.8
         return view
     }()
+    
     lazy var contentImageView: UIImageView = {
         let view = UIImageView()
         view.clipsToBounds = true
@@ -94,6 +101,7 @@ class PostCell: UITableViewCell {
         
         return view
     }()
+    
     lazy var descriptionLbl: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -103,6 +111,7 @@ class PostCell: UITableViewCell {
         label.sizeToFit()
         return label
     }()
+    
     lazy var mainView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -114,7 +123,6 @@ class PostCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
         
         self.contentView.addSubview(mainView)
         mainView.addSubview(descriptionLbl)
@@ -133,15 +141,14 @@ class PostCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        self.descriptionLbl.text = ""
-        self.contentImageView.image = nil
-        self.likeCountLabel.text = ""
-        self.commentsCountLabel.text = ""
-        self.shareCountLabel.text = ""
+        task?.cancel()
+        contentImageView.image = nil
     }
+    
     private func setupUI() {
         NSLayoutConstraint.activate([
             mainView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
@@ -174,6 +181,17 @@ class PostCell: UITableViewCell {
             activityIndicator.centerYAnchor.constraint(equalTo: mainView.centerYAnchor)
         ])
     }
+    
+    private func setImage() {
+        if let url = imageURL {
+            activityIndicator.startAnimating()
+            task = ImageService.getImage(withUrl: url) { [weak self] image in
+                self?.activityIndicator.stopAnimating()
+                self?.contentImageView.image = image
+            }
+        }
+    }
+    
     func setupCell(fromPost item: Item) {
         self.likeImageView.image = UIImage(named: "like")
         self.likeCountLabel.text = String(item.stats.likes.count)
@@ -181,36 +199,12 @@ class PostCell: UITableViewCell {
         self.commentsCountLabel.text = String(item.stats.comments.count)
         self.shareImageView.image = UIImage(named: "share")
         self.shareCountLabel.text = String(item.stats.shares.count)
+        self.contentImageView.image = nil
         
-        item.contents.forEach { content in
-            
-            switch content.type {
-            case "TEXT":
-                self.descriptionLbl.text = content.data.value
-            case "IMAGE":
-                if let url = content.data.original?.url {
-                    self.imageURL = URL(string: url)
-                }
-            case "IMAGE_GIF":
-                if let url = content.data.original?.url {
-                    self.imageURL = URL(string: url)
-                }
-            case "VIDEO":
-                if let url = content.data.previewImage?.data.medium.url {
-                    self.imageURL = URL(string: url)
-                }
-            default:
-                break
-            }
+        self.imageURL = item.firstContentImageURL
+        if let text = item.contentDescriptionText {
+            self.descriptionLbl.text = text
         }
-    }
-    private func setImage() {
-        activityIndicator.startAnimating()
-        if let url = imageURL {
-            ImageService.getImage(withUrl: url) { image in
-                self.contentImageView.image = image
-            }
-        }
-        activityIndicator.stopAnimating()
+        
     }
 }

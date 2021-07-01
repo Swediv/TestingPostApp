@@ -37,28 +37,8 @@ class DetailsInteractor: DetailsInteractorProtocol {
     }
     
     func getContentImage() {
-        var contentImageURL: URL?
-        self.post.contents.forEach({ content in
-            
-            switch content.type {
-            case "IMAGE":
-                if let url = content.data.original?.url {
-                    contentImageURL = URL(string: url)
-                }
-            case "IMAGE_GIF":
-                if let url = content.data.original?.url {
-                    contentImageURL = URL(string: url)
-                }
-            case "VIDEO":
-                if let url = content.data.previewImage?.data.medium.url {
-                    contentImageURL = URL(string: url)
-                }
-            default:
-                break
-            }
-        })
         
-        if let imageURL = contentImageURL {
+        if let imageURL = self.post.firstContentImageURL{
             ImageService.getImage(withUrl: imageURL) { image in
                 self.presenter.setContentImage(with: image)
             }

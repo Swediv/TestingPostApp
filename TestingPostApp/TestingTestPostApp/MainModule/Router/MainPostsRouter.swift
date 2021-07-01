@@ -11,14 +11,13 @@ import UIKit
 class MainPostsRouter: MainPostsRouterProtocol {
 
     weak var view: MainPostsView!
-    var configurator: DetailsConfiguratorProtocol = DetailsConfigurator()
     
     init(view: MainPostsView) {
         self.view = view
     }
     func presentDetailViewController(withPost post: Item) {
         let vc = DetailsViewController()
-        configurator.configure(with: vc, post: post)
+        vc.configurator.configure(with: vc, post: post)
         view.navigationController?.pushViewController(vc, animated: true)
     }
     

@@ -11,10 +11,11 @@ import UIKit
 class ImageService {
     private static let cache = NSCache<NSString, UIImage>()
     
-    static func downloadImage(withUrl url: URL, completion: @escaping (_ image: UIImage?) -> Void) {
+    @discardableResult
+    static func downloadImage(withUrl url: URL, completion: @escaping (_ image: UIImage?) -> Void) -> URLSessionTask {
         var downloadedImage: UIImage?
         
-        URLSession.shared.dataTask(with: url) { data, _, _ in
+        let task = URLSession.shared.dataTask(with: url) { data, _, _ in
             if let data = data {
                 downloadedImage = UIImage(data: data)
             }
@@ -24,13 +25,20 @@ class ImageService {
             DispatchQueue.main.async {
                 completion(downloadedImage)
             }
-        }.resume()
+        }
+        
+        task.resume()
+        
+        return task
     }
-    static func getImage(withUrl url: URL, completion: @escaping (_ image: UIImage?) -> Void) {
+    
+    @discardableResult
+    static func getImage(withUrl url: URL, completion: @escaping (_ image: UIImage?) -> Void) -> URLSessionTask? {
         if let image = cache.object(forKey: url.absoluteString as NSString) {
             completion(image)
+            return nil
         } else {
-            downloadImage(withUrl: url, completion: completion)
+            return downloadImage(withUrl: url, completion: completion)
         }
     }
 }

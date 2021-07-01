@@ -9,11 +9,10 @@ import Foundation
 import UIKit
 
 class MainPostsView: UIViewController, MainPostsViewProtocol {
+    var configurator: MainConfiguratorProtocol = MainConfigurator()//конфигуратор точно здесь нужен? обычно это обособленная конструкция, нужная только для сборки модуля
     
-    
-    var configurator: MainConfiguratorProtocol = MainConfigurator()
     var presenter: MainPostsPresenterProtocol!
-    var isLoading = false
+    
     lazy var loadLabel: UILabel = {
         let label = UILabel()
         label.text = "Loading..."
@@ -21,6 +20,7 @@ class MainPostsView: UIViewController, MainPostsViewProtocol {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
     lazy var activityIndicator: UIActivityIndicatorView = {
         let refreshControl = UIActivityIndicatorView()
         refreshControl.color = .white
@@ -30,10 +30,9 @@ class MainPostsView: UIViewController, MainPostsViewProtocol {
         refreshControl.style = .large
         refreshControl.hidesWhenStopped = true
         refreshControl.translatesAutoresizingMaskIntoConstraints = false
-        
-        
         return refreshControl
     }()
+    
     lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.delegate = self
@@ -42,7 +41,6 @@ class MainPostsView: UIViewController, MainPostsViewProtocol {
         tableView.backgroundView = UIImageView(image: UIImage(named: "sky1"))
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
-        
         return tableView
     }()
     
@@ -105,37 +103,37 @@ class MainPostsView: UIViewController, MainPostsViewProtocol {
             self.tableView.reloadData()
         }
     }
+    
     func startAnimating() {
         DispatchQueue.main.async {
             self.activityIndicator.startAnimating()
         }
         
     }
+    
     func stopAnimating() {
         DispatchQueue.main.async {
             self.activityIndicator.stopAnimating()
         }
         
     }
+    
     func setTableAtStartPosition() {
-        tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+        tableView.setContentOffset(.zero, animated: true)
     }
+    
     @objc
     private func sortedBy(_ sender: UISegmentedControl) {
-        presenter.isSorted = true
         switch sender.selectedSegmentIndex {
         case 0:
-            self.activityIndicator.startAnimating()
             presenter.sorting = .mostPopular
-            self.activityIndicator.stopAnimating()
+            
         case 1:
-            self.activityIndicator.startAnimating()
             presenter.sorting = .mostCommented
-            self.activityIndicator.stopAnimating()
+            
         case 2:
-            self.activityIndicator.startAnimating()
             presenter.sorting = .createdAt
-            self.activityIndicator.stopAnimating()
+            
         default:
             break
         }
@@ -165,21 +163,15 @@ extension MainPostsView: UITableViewDelegate, UITableViewDataSource {
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        if scrollView.isReachedBottom(withTolerance: tableView.bounds.height + 60) {
-            if !isLoading {
-                isLoading = true
-                presenter.loadPosts(isLoading: isLoading)
-            }
+        if scrollView.isReachedBottom(withTolerance: 60) {
+            presenter.loadPosts()
         }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            if scrollView.isReachedBottom(withTolerance: tableView.bounds.height + 60) {
-                if !isLoading {
-                    isLoading = true
-                    self.presenter.loadPosts(isLoading: isLoading)         
-                }
+            if scrollView.isReachedBottom(withTolerance: 60) {
+                presenter.loadPosts()
             }
         }
     }

@@ -7,21 +7,28 @@
 
 import Foundation
 
-protocol NetworkManagerProtocol: AnyObject {
-    func request(_ builder: URLBuilder, completion: @escaping(Result<Data, Error>) -> Void)
-}
 class NetworkManager {
     static let shared = NetworkManager()
     
-    func request(_ builder: URLBuilder, completion: @escaping(Result<Data, Error>) -> Void) {
-        guard let url = builder.url else { return }
-        URLSession.shared.dataTask(with: url) { data, response, error in
+    @discardableResult
+    func request(_ builder: URLBuilder, completion: @escaping(Result<Data, Error>) -> Void) -> URLSessionDataTask? {
+        guard let url = builder.build() else { return nil }
+        
+        debugPrint("NetworkManager: request: \(url)")
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
+                debugPrint("NetworkManager: error: \(error)")
                 completion(.failure(error))
             }
             if let data = data {
+                debugPrint("NetworkManager: success")
                 completion(.success(data))
             }
-        }.resume()
+        }
+        
+        task.resume()
+        
+        return task
     }
 }
