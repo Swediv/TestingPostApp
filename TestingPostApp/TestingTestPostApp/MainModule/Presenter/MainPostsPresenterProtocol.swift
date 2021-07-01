@@ -8,13 +8,9 @@
 import Foundation
 
 protocol MainPostsPresenterProtocol: AnyObject {
-    var isSorted: Bool { get set }
     var sorting: Sorting? { get set }
     var posts: [Item] { get set }
-    init(view: MainPostsViewProtocol)
     func didTapSelectedRow(atPost post: Item)
-    func interactorDidFetchedPosts(with result: Result<[Item]?,Error>)
-    func interactorDidFetchedNewPosts(with result: Result<[Item]?,Error>)
-    func interactorNotFetchedNewPosts()
-    func loadPosts(isLoading: Bool)
+    func interactorDidFetchedPosts(with result: Result<[Item], FetchError>, isNeedToClear: Bool)
+    func loadPosts()
 }

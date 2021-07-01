@@ -7,18 +7,9 @@
 
 import Foundation
 
-protocol PostProtocol {
-    
-}
-protocol PostDataProtocol {
-    
-}
-protocol ItemProtocol {
-    
-}
 // MARK: - Post
 struct Post: Codable {
-    let data: PostData?
+    let data: PostData
 }
 
 // MARK: - PostData
@@ -45,6 +36,54 @@ struct Item: Codable {
     let author: Author?
     let stats: Stats
     let isMyFavorite: Bool
+    
+    var firstContentImageURL: URL? {
+        var result: URL?
+        
+        contents.forEach { content in
+            switch content.type {
+            case "IMAGE":
+                if let string = content.data.original?.url, let url = URL(string: string) {
+                    result = url
+                    break
+                }
+                
+            case "IMAGE_GIF":
+                if let string = content.data.original?.url, let url = URL(string: string) {
+                    result = url
+                    break
+                }
+                
+            case "VIDEO":
+                if let string = content.data.original?.url, let url = URL(string: string) {
+                    result = url
+                    break
+                }
+                
+            default:
+                break
+            }
+        }
+        
+        return result
+    }
+    var contentDescriptionText: String? {
+        var result: String?
+        
+        contents.forEach { content in
+            
+            
+            switch content.type {
+            case "TEXT":
+                if let text = content.data.value {
+                    result = text
+                }
+            default:
+                break
+            }
+        }
+        return result
+    }
 
     enum CodingKeys: String, CodingKey {
         case id, isCreatedByPage
@@ -230,13 +269,8 @@ enum ItemType: String, Codable {
 // MARK: - Encode/decode helpers
 
 class JSONNull: Codable, Hashable {
-
     public static func == (lhs: JSONNull, rhs: JSONNull) -> Bool {
         return true
-    }
-
-    public var hashValue: Int {
-        return 0
     }
 
     public init() {}
@@ -251,5 +285,9 @@ class JSONNull: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encodeNil()
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(0)
     }
 }

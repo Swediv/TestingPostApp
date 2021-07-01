@@ -10,7 +10,7 @@ import UIKit
 class DetailsViewController: UIViewController, DetailsViewControllerProtocol {
     var presenter: DetailsPresenterProtocol!
     
-//    var configurator: DetailsConfiguratorProtocol = DetailsConfigurator()
+    var configurator: DetailsConfiguratorProtocol = DetailsConfigurator()
     
     lazy var loadLabel: UILabel = {
         let label = UILabel()

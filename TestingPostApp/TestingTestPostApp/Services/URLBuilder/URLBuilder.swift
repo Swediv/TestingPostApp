@@ -12,29 +12,44 @@ enum Sorting: String {
     case mostCommented = "mostCommented"
     case createdAt = "createdAt"
 }
-struct URLBuilder {
-    private var queryItems: [URLQueryItem]?
+
+enum URLBuilder {
+    case forLoading(cursor: String?, sorting: Sorting?)
     
-    var url: URL? {
+    var queryItems: [URLQueryItem] {
+        var queryItems: [URLQueryItem] = []
+        
+        switch self {
+        case let .forLoading(cursor: cursor, sorting: sorting):
+            if let cursor = cursor {
+                queryItems.append(URLQueryItem(name: "after", value: cursor))
+            }
+            
+            if let sorting = sorting {
+                queryItems.append(URLQueryItem(name: "orderBy", value: sorting.rawValue))
+            }
+        }
+        
+        return queryItems
+    }
+    
+    var path: String {
+        switch self {
+        case .forLoading:
+            return "/posts/v1/posts"
+        }
+    }
+    
+    func build() -> URL? {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "k8s-stage.apianon.ru"
-        components.path = "/posts/v1/posts"
-        components.queryItems = queryItems
+        components.path = path
+        
+        if !queryItems.isEmpty {
+            components.queryItems = queryItems
+        }
         
         return components.url
-    }
-    public static func forLoading(withCursor cursor: String?, sortingBy sorting: Sorting?, isSorted: Bool) -> URLBuilder {
-        if isSorted {
-            if cursor == nil {
-                return URLBuilder(queryItems: [URLQueryItem(name: "orderBy", value: sorting?.rawValue)])
-            }
-            return URLBuilder(queryItems: [URLQueryItem(name: "orderBy", value: sorting?.rawValue), URLQueryItem(name: "after", value: cursor)])
-        } else {
-            if cursor == nil {
-                return URLBuilder(queryItems: nil)
-            }
-            return URLBuilder(queryItems: [URLQueryItem(name: "after", value: cursor)])
-        }
     }
 }

@@ -9,6 +9,5 @@ import Foundation
 
 protocol MainPostsInteractorProtocol: AnyObject {
     var cursor: String? { get set }
-    init(presenter: MainPostsPresenterProtocol)
-    func getPosts(withSorting isSorted: Bool, sortingBy: Sorting?, isLoading: Bool)
+    func getPosts(sortingBy: Sorting?, isNeedToClear: Bool)
 }
