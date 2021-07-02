@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 class MainPostsView: UIViewController, MainPostsViewProtocol {
-    var configurator: MainConfiguratorProtocol = MainConfigurator()//конфигуратор точно здесь нужен? обычно это обособленная конструкция, нужная только для сборки модуля
+    var configurator: MainConfiguratorProtocol = MainConfigurator()
     
     var presenter: MainPostsPresenterProtocol!
     
@@ -65,19 +65,23 @@ class MainPostsView: UIViewController, MainPostsViewProtocol {
         setupUI()
         configurator.configure(with: self)
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
     }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
+    
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         
         setConstraints()
     }
+    
     private func setupUI() {
         view.backgroundColor = #colorLiteral(red: 0.767541945, green: 0.7676720023, blue: 0.7675247788, alpha: 1)
         view.addSubview(tableView)
@@ -85,6 +89,7 @@ class MainPostsView: UIViewController, MainPostsViewProtocol {
         view.addSubview(activityIndicator)
         sortSegmentedControl.addTarget(self, action: #selector(sortedBy(_:)), for: .valueChanged)
     }
+    
     private func setConstraints() {
         sortSegmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         sortSegmentedControl.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: -3).isActive = true

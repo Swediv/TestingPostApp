@@ -23,12 +23,11 @@ struct Item: Codable {
     let id: String
     let isCreatedByPage: Bool?
     let videoElementID: JSONNull?
-    let status: Status
-    let type: ItemType
-    let coordinates: Coordinates?
+    let status, type: String
+    let coordinates: JSONNull?
     let isCommentable, hasAdultContent, isAuthorHidden, isHiddenInProfile: Bool
     let contents: [Content]
-    let language: Language
+    let language: String
     let awards: Awards
     let createdAt, updatedAt: Int
     let isSecret: Bool
@@ -71,8 +70,7 @@ struct Item: Codable {
         var result: String?
         
         contents.forEach { content in
-            
-            
+                  
             switch content.type {
             case "TEXT":
                 if let text = content.data.value {
@@ -86,10 +84,10 @@ struct Item: Codable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case id, isCreatedByPage
-        case videoElementID = "videoElementId"
-        case status, type, coordinates, isCommentable, hasAdultContent, isAuthorHidden, isHiddenInProfile, contents, language, awards, createdAt, updatedAt, isSecret, page, author, stats, isMyFavorite
-    }
+            case id, isCreatedByPage
+            case videoElementID = "videoElementId"
+            case status, type, coordinates, isCommentable, hasAdultContent, isAuthorHidden, isHiddenInProfile, contents, language, awards, createdAt, updatedAt, isSecret, page, author, stats, isMyFavorite
+        }
 }
 
 // MARK: - Author
@@ -97,16 +95,16 @@ struct Author: Codable {
     let id: String
     let url: String?
     let name: String
-    let banner: Banner?
+    let banner: Photo?
     let photo: Photo?
-    let gender: Gender
+    let gender: String
     let isHidden, isBlocked, allowNewSubscribers, showSubscriptions: Bool
     let showSubscribers, isMessagingAllowed: Bool
     let auth: Auth
     let statistics: Statistics
     let tagline: String
     let data: AuthorData
-    let photoSpecialStyle, photoSpecialVariant: Int?
+    let nameSpecialStyle, photoSpecialStyle, photoSpecialVariant: Int?
 }
 
 // MARK: - Auth
@@ -115,19 +113,18 @@ struct Auth: Codable {
     let lastSeenAt, level: Int
 }
 
-// MARK: - Banner
-struct Banner: Codable {
-    let type: BannerType
+// MARK: - Photo
+struct Photo: Codable {
+    let type: TypeEnum
     let id: String
-    let data: BannerData
+    let data: PhotoData
 }
 
-// MARK: - BannerData
-struct BannerData: Codable {
-    let extraSmall, small: ExtraLarge
-    let medium, large: ExtraLarge?
+// MARK: - PhotoData
+struct PhotoData: Codable {
+    let extraSmall: ExtraLarge
+    let small, medium, large, extraLarge: ExtraLarge?
     let original: ExtraLarge
-    let extraLarge: ExtraLarge?
 }
 
 // MARK: - ExtraLarge
@@ -141,7 +138,7 @@ struct Size: Codable {
     let width, height: Int
 }
 
-enum BannerType: String, Codable {
+enum TypeEnum: String, Codable {
     case image = "IMAGE"
     case imageGIF = "IMAGE_GIF"
 }
@@ -150,32 +147,12 @@ enum BannerType: String, Codable {
 struct AuthorData: Codable {
 }
 
-enum Gender: String, Codable {
-    case male = "MALE"
-    case other = "OTHER"
-    case unset = "UNSET"
-}
-
-// MARK: - Photo
-struct Photo: Codable {
-    let type: BannerType
-    let id: String
-    let data: PhotoData
-}
-
-// MARK: - PhotoData
-struct PhotoData: Codable {
-    let extraSmall: ExtraLarge
-    let small, medium: ExtraLarge?
-    let original: ExtraLarge
-}
-
 // MARK: - Statistics
 struct Statistics: Codable {
     let likes: Int
     let thanks: Double
     let uniqueName: Bool
-    let thanksNextLevel: Int
+    let thanksNextLevel, subscribersCount, subscriptionsCount: Int
 }
 
 // MARK: - Awards
@@ -202,37 +179,25 @@ struct Content: Codable {
 // MARK: - ContentData
 struct ContentData: Codable {
     let value: String?
-    let extraSmall, small, original, medium: ExtraLarge?
-    let large: ExtraLarge?
     let duration: Double?
     let url: String?
+    let small, original: ExtraLarge?
+    let values: [String]?
     let size: Size?
     let previewImage: PreviewImage?
-    let extraLarge: ExtraLarge?
-    let values: [String]?
+    let extraSmall, medium, large: ExtraLarge?
 }
 
 // MARK: - PreviewImage
 struct PreviewImage: Codable {
-    let type: BannerType
+    let type: TypeEnum
     let id: String
     let data: PreviewImageData
 }
 
 // MARK: - PreviewImageData
 struct PreviewImageData: Codable {
-    let extraSmall, medium: ExtraLarge
-}
-
-// MARK: - Coordinates
-struct Coordinates: Codable {
-    let latitude, longitude: Double
-    let zoom: Int?
-}
-
-enum Language: String, Codable {
-    case en = "en"
-    case ru = "ru"
+    let extraSmall: ExtraLarge
 }
 
 // MARK: - Stats
@@ -253,17 +218,6 @@ struct TimeLeftToSpace: Codable {
     let count: Int?
     let maxCount: JSONNull?
     let my: Bool
-}
-
-enum Status: String, Codable {
-    case published = "PUBLISHED"
-}
-
-enum ItemType: String, Codable {
-    case audioCover = "AUDIO_COVER"
-    case plain = "PLAIN"
-    case video = "VIDEO"
-    case plainCover = "PLAIN_COVER"
 }
 
 // MARK: - Encode/decode helpers

@@ -26,7 +26,7 @@ class MainPostsPresenter: MainPostsPresenterProtocol {
     var interactor: MainPostsInteractorProtocol! {
         didSet {
             view.startAnimating()
-            interactor.getPosts(sortingBy: sorting, isNeedToClear: true)
+            interactor.getPosts(sortingBy: sorting, isNeedToClear: false)
         }
     }
     
