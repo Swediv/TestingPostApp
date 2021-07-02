@@ -31,6 +31,7 @@ class MainPostsInteractor: MainPostsInteractorProtocol {
             
             switch result {
             case .success(let data):
+                debugPrint("jsonData:\(data)")
                 let jsonData = ParsingService.shared.decode(Post.self, fromData: data)
                 switch jsonData {
                 case let .success(post):

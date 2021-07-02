@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
         window = UIWindow()
+        
         let navigationController = UINavigationController(rootViewController: MainPostsView())
         
         window?.rootViewController = navigationController

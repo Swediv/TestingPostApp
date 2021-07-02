@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import UIKit
 
 class MainConfigurator: MainConfiguratorProtocol {
-    func configure(with viewController: MainPostsView) {
+    func configure(with viewController: MainPostsView)  {
         let presenter = MainPostsPresenter(view: viewController)
         let interactor = MainPostsInteractor(presenter: presenter)
         let router = MainPostsRouter(view: viewController)
